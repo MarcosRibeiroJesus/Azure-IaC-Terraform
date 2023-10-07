@@ -1,7 +1,8 @@
 name: Deploy to Azure
 
 permissions:
-      id-token: write
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 on:
   push:
@@ -9,6 +10,20 @@ on:
       - main
 
 jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Azure CLI
+        run: sudo apt-get update && sudo apt-get install -y azure-cli
+      - name: Debug Azure CLI version
+        run: az --version
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ secrets.ARM_TENANT_ID }}
+          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
   terraform:
     runs-on: ubuntu-latest
 
@@ -16,22 +31,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install Azure CLI
-      run: |
-        sudo apt-get update && sudo apt-get install -y azure-cli
-
-    - name: Debug Azure CLI version
-      run: az --version
-
     - name: Debug GitHub context
       run: echo "${{ toJson(github) }}"
-
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.ARM_CLIENT_ID }}
-        tenant-id: ${{ secrets.ARM_TENANT_ID }}
-        subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
