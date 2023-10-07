@@ -1,5 +1,8 @@
 name: Deploy to Azure
 
+permissions:
+      id-token: write
+
 on:
   push:
     branches:
@@ -26,7 +29,9 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        client-id: ${{ secrets.ARM_CLIENT_ID }}
+        tenant-id: ${{ secrets.ARM_TENANT_ID }}
+        subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
