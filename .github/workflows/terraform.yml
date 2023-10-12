@@ -45,7 +45,8 @@ jobs:
 
       - name: Check if Azure Storage Account exists
         run: |
-          NEW_STORAGE_ACCOUNT_NAME=tfstatestorageaccount$(date +%s) # Unique name using timestamp
+          TIMESTAMP=$(date +%s)
+          NEW_STORAGE_ACCOUNT_NAME=tfstate$((TIMESTAMP % 9999)) # Unique name using timestamp modulo
           if az storage account show --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup &> /dev/null
           then
             echo "Storage Account already exists"
