@@ -93,13 +93,13 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
 }
 
 # Storage Account for TF Backend
-resource "azurerm_storage_account" "tfstate" {
-  name                     = "tfstatestorageaccount"
-  resource_group_name      = azurerm_resource_group.xpe.name
-  location                 = azurerm_resource_group.xpe.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
+#resource "azurerm_storage_account" "tfstate" {
+#  name                     = "tfstatestorageaccount"
+#  resource_group_name      = azurerm_resource_group.xpe.name
+#  location                 = azurerm_resource_group.xpe.location
+#  account_tier             = "Standard"
+#  account_replication_type = "LRS"
+#}
 
 # Virtual Network
 resource "azurerm_virtual_network" "xpe" {
