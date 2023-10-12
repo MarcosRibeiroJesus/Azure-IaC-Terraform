@@ -73,6 +73,24 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
   value        = file(".ssh/id_rsa.pub")  # Update with the path to your SSH public key
 }
 
+# Storage Account
+resource "azurerm_storage_account" "tfstate" {
+  name                     = "tfstatestorageaccount"
+  resource_group_name      = azurerm_resource_group.xpe.name
+  location                 = azurerm_resource_group.xpe.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+# Azure Storage Backend for Terraform state
+terraform {
+  backend "azurerm" {
+    resource_group_name   = azurerm_resource_group.xpe.name
+    storage_account_name   = azurerm_storage_account.tfstate.name
+    container_name         = "tfstatecontainer"
+    key                    = "terraform.tfstate"
+  }
+}
 
 # Virtual Network
 resource "azurerm_virtual_network" "xpe" {
