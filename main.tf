@@ -70,7 +70,7 @@ resource "azurerm_key_vault" "xpe" {
 resource "azurerm_key_vault_secret" "ssh_public_key" {
   name         = "ssh-public-key"
   key_vault_id = azurerm_key_vault.xpe.id
-  value        = file("~/.ssh/id_rsa.pub")  # Update with the path to your SSH public key
+  value        = file(".ssh/id_rsa.pub")  # Update with the path to your SSH public key
 }
 
 
