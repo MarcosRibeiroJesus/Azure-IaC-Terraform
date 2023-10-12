@@ -73,5 +73,9 @@ jobs:
       #- name: Apply Terraform
       #  run: terraform apply -auto-approve
 
-      - name: Clean up
-        run: terraform destroy -auto-approve
+      - name: Run Terraform Destroy
+        run: |
+          terraform destroy -auto-approve \
+            -var="subscription_id=${SUBSCRIPTION_ID}" \
+            -var="tenant_id=${TENANT_ID}" \
+            -var="client_id=${CLIENT_ID}"
