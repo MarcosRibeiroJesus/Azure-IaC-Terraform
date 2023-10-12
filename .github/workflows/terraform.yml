@@ -43,21 +43,27 @@ jobs:
         with:
           terraform_version: 1.1.0
 
-      - name: Check and create Azure Storage Account
+      - name: Check if Azure Storage Account exists
         run: |
-          az storage account show --name tfstatestorageaccount --resource-group myxpeResourceGroup || az storage account create --name tfstatestorageaccount --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
+          if az storage account show --name tfstatestorageaccount --resource-group myxpeResourceGroup &> /dev/null
+          then
+            echo "Storage Account already exists"
+          else
+            echo "Storage Account does not exist, creating..."
+            az storage account create --name tfstatestorageaccount --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
+          fi
 
-      - name: Set up Terraform Backend
+      - name: Set up Terraform
         run: |
           terraform -v
           terraform init -backend-config="resource_group_name=myxpeResourceGroup" \
-                    -backend-config="storage_account_name=tfstatestorageaccount" \
-                    -backend-config="container_name=tfstatecontainer" \
-                    -backend-config="key=terraform.tfstate" \
-                    -backend-config="use_oidc=true" \
-                    -backend-config="subscription_id=${SUBSCRIPTION_ID}" \
-                    -backend-config="tenant_id=${TENANT_ID}" \
-                    -backend-config="client_id=${CLIENT_ID}"
+                          -backend-config="storage_account_name=tfstatestorageaccount" \
+                          -backend-config="container_name=tfstatecontainer" \
+                          -backend-config="key=terraform.tfstate" \
+                          -backend-config="use_oidc=true" \
+                          -backend-config="subscription_id=${SUBSCRIPTION_ID}" \
+                          -backend-config="tenant_id=${TENANT_ID}" \
+                          -backend-config="client_id=${CLIENT_ID}"
 
       #- name: Terraform Plan
       #  run: terraform plan -out=tfplan
