@@ -53,7 +53,7 @@ resource "azurerm_key_vault" "xpe" {
     object_id = data.azurerm_client_config.current.object_id
 
     key_permissions = [
-      "Get", "Set"
+      "Get", "Create", "Update"
     ]
 
     secret_permissions = [
@@ -61,7 +61,7 @@ resource "azurerm_key_vault" "xpe" {
         ]
 
     storage_permissions = [
-      "Get",
+      "Get", "Set", "List", "Update"
     ]
   }
 }
