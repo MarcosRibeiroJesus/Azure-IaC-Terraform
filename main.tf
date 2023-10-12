@@ -9,8 +9,15 @@ terraform {
   }
 }
 
+variable "subscription_id" {}
+variable "tenant_id" {}
+variable "client_id" {}
+
 provider "azurerm" {
-  # use_oidc = true
+  use_oidc = true
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
+  client_id       = var.client_id
   features {
     key_vault {
       purge_soft_delete_on_destroy    = true
