@@ -41,11 +41,11 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
+      #- name: Terraform Plan
+      #  run: terraform plan -out=tfplan
 
       - name: Apply Terraform
         run: terraform apply -auto-approve
 
-      # - name: Clean up
-      #   run: terraform destroy -auto-approve
+      #- name: Clean up
+      #  run: terraform destroy -auto-approve
