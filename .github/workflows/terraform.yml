@@ -45,12 +45,13 @@ jobs:
 
       - name: Check if Azure Storage Account exists
         run: |
-          if az storage account show --name tfstatestorageaccount --resource-group myxpeResourceGroup &> /dev/null
+          NEW_STORAGE_ACCOUNT_NAME=tfstatestorageaccount$(date +%s) # Unique name using timestamp
+          if az storage account show --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup &> /dev/null
           then
             echo "Storage Account already exists"
           else
             echo "Storage Account does not exist, creating..."
-            az storage account create --name tfstatestorageaccount --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
+            az storage account create --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
           fi
 
       - name: Set up Terraform
