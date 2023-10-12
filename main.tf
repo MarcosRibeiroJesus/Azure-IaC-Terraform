@@ -136,10 +136,11 @@ resource "azurerm_network_interface" "xpe" {
 
 # Assign Virtual Machine Contributor role to service principal
 resource "azurerm_role_assignment" "vm_contributor" {
-  scope                = azurerm_linux_virtual_machine.example.id
-  principal_id         = data.azurerm_client_config.current.service_principal_object_id
+  scope                = azurerm_linux_virtual_machine.xpe.id
+  principal_id         = data.azurerm_client_config.current.object_id
   role_definition_name = "Virtual Machine Contributor"
 }
+
 
 # Virtual Machine
 resource "azurerm_linux_virtual_machine" "xpe" {
@@ -181,7 +182,7 @@ resource "azurerm_storage_account" "xpe" {
 
 # Assign Custom Role to Service Principal for Storage
 resource "azurerm_role_assignment" "storage_contributor" {
-  principal_id         = data.azurerm_client_config.current.service_principal_object_id
+  principal_id         = data.azurerm_client_config.current.object_id
   role_definition_name = azurerm_role_definition.custom.name
   scope                = azurerm_storage_account.xpe.id
 }
