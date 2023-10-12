@@ -13,6 +13,11 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    env:
+      SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -38,8 +43,21 @@ jobs:
         with:
           terraform_version: 1.1.0
 
-      - name: Initialize Terraform
-        run: terraform init
+      - name: Check and create Azure Storage Account
+        run: |
+          az storage account show --name tfstatestorageaccount --resource-group myxpeResourceGroup || az storage account create --name tfstatestorageaccount --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
+
+      - name: Set up Terraform Backend
+        run: |
+          terraform -v
+          terraform init -backend-config="resource_group_name=myxpeResourceGroup" \
+                    -backend-config="storage_account_name=tfstatestorageaccount" \
+                    -backend-config="container_name=tfstatecontainer" \
+                    -backend-config="key=terraform.tfstate" \
+                    -backend-config="use_oidc=true" \
+                    -backend-config="subscription_id=${SUBSCRIPTION_ID}" \
+                    -backend-config="tenant_id=${TENANT_ID}" \
+                    -backend-config="client_id=${CLIENT_ID}"
 
       #- name: Terraform Plan
       #  run: terraform plan -out=tfplan

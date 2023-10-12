@@ -1,4 +1,16 @@
+# We strongly recommend using the required_providers block to set the
+# Azure Provider source and version being used
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.7.0"
+    }
+  }
+}
+
 provider "azurerm" {
+  use_oidc = true
   features {
     key_vault {
       purge_soft_delete_on_destroy    = true
@@ -73,7 +85,7 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
   value        = file(".ssh/id_rsa.pub")  # Update with the path to your SSH public key
 }
 
-# Storage Account
+# Storage Account for TF Backend
 resource "azurerm_storage_account" "tfstate" {
   name                     = "tfstatestorageaccount"
   resource_group_name      = azurerm_resource_group.xpe.name
