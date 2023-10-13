@@ -43,34 +43,26 @@ jobs:
         with:
           terraform_version: 1.1.0
 
-      - name: Check if Azure Storage Account exists
-        run: |
-          TIMESTAMP=$(date +%s)
-          NEW_STORAGE_ACCOUNT_NAME=tfstatexpemrj$((TIMESTAMP % 9999999)) # Unique name using timestamp modulo
-          if az storage account show --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup &> /dev/null
-          then
-            echo "Storage Account already exists"
-          else
-            echo "Storage Account does not exist, creating..."
-            az storage account create --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
-          fi
-
       - name: Terraform Init
-        run: terraform init
+        run: | 
+          terraform init \
+            -var="subscription_id=${SUBSCRIPTION_ID}" \
+            -var="tenant_id=${TENANT_ID}" \
+            -var="client_id=${CLIENT_ID}"
 
       #- name: Terraform Plan
       #  run: terraform plan -out=tfplan
 
-      #- name: Apply Terraform
-      #  run: |
-      #    terraform apply -auto-approve \
-      #      -var="subscription_id=${SUBSCRIPTION_ID}" \
-      #      -var="tenant_id=${TENANT_ID}" \
-      #      -var="client_id=${CLIENT_ID}"
-
-      - name: Run Terraform Destroy
+      - name: Apply Terraform
         run: |
-          terraform destroy -auto-approve \
+          terraform apply -auto-approve \
             -var="subscription_id=${SUBSCRIPTION_ID}" \
             -var="tenant_id=${TENANT_ID}" \
             -var="client_id=${CLIENT_ID}"
+
+      #- name: Run Terraform Destroy
+      #  run: |
+      #    terraform destroy -auto-approve \
+      #      -var="subscription_id=${SUBSCRIPTION_ID}" \
+      #      -var="tenant_id=${TENANT_ID}" \
+      #      -var="client_id=${CLIENT_ID}"
