@@ -1,21 +1,18 @@
 # We strongly recommend using the required_providers block to set the
 # Azure Provider source and version being used
 terraform {
-
-  backend "azurerm" {
-    resource_group_name = "XpeTerraformRG"
-    storage_account_name = "xpesolutionsmodule1"
-    container_name = "tfstatefile"
-    key = "xpe.terraform.tfstate"
-  }
-  
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.7.0"
+      version = "~>3.0"
     }
   }
 
+  backend "azurerm" {
+    use_oidc = true
+    use_azuread_auth = true
+    key = "terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
