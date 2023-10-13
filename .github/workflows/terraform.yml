@@ -1,79 +1,58 @@
-name: Deploy to Azure 🚀🌤️
+name: Push
 
 on:
   push:
     branches:
       - main
 
+env:
+  TF_LOG: INFO
+
 permissions:
-  id-token: write
-  contents: read
-
-jobs:
-  terraform:
+      id-token: write
+      contents: read
+jobs: 
+  deploy-infra:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+    # Install the latest version of Terraform CLI 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      
+    # Log into Azure with OIDC integration
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: "Az CLI login"
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    # Run az commands to confirm sub access
+    - name: 'Run az commands'
+      run: |
+        az account show
 
-      - name: "Run Azure CLI commands"
-        run: |
-          az account show
-          az group list
-          pwd
+    # Run Terraform init
+    - name: Terraform Init
+      id: init
+      env:
+        STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
+        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+        RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      run: terraform init -backend-config="storage_account_name=$STORAGE_ACCOUNT" -backend-config="container_name=$CONTAINER_NAME" -backend-config="resource_group_name=$RESOURCE_GROUP_NAME"
 
-      - name: Terraform Init
-        id: init
-        env:
-          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
-          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        run: terraform init -backend-config="storage_account_name=$STORAGE_ACCOUNT" -backend-config="container_name=$CONTAINER_NAME" -backend-config="resource_group_name=$RESOURCE_GROUP_NAME"
-
-      - name: Debug GitHub context
-        run: echo "${{ toJson(github) }}"
-
-      # Run a Terraform fmt
-      - name: Terraform format
-        id: fmt
-        run: terraform fmt -check
-
-      # Run a Terraform validate
-      - name: Terraform validate
-        id: validate
-        if: success() || failure()
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform validate -no-color
-
-      # Run a Terraform apply
-      - name: Terraform apply
-        id: apply
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform apply -auto-approve
-
-      #- name: Run Terraform Destroy
-      #  run: |
-      #    terraform destroy -auto-approve \
-      #      -var="subscription_id=${SUBSCRIPTION_ID}" \
-      #      -var="tenant_id=${TENANT_ID}" \
-      #      -var="client_id=${CLIENT_ID}"
+    # Run a Terraform apply
+    - name: Terraform apply
+      id: apply
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      run: terraform apply -auto-approve

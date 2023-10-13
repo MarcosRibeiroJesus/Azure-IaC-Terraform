@@ -1,5 +1,3 @@
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
 terraform {
   required_providers {
     azurerm = {
@@ -9,8 +7,8 @@ terraform {
   }
 
   backend "azurerm" {
-    key = "terraform.tfstate"
-    use_oidc = true
+    key              = "terraform.tfstate"
+    use_oidc         = true
     use_azuread_auth = true
   }
 }

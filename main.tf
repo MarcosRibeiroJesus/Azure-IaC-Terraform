@@ -6,9 +6,6 @@ provider "azurerm" {
     }
   }
   use_oidc = true
-  subscription_id = SUBSCRIPTION_ID
-  tenant_id       = TENANT_ID
-  client_id       = CLIENT_ID
 }
 
 # Service Principal
