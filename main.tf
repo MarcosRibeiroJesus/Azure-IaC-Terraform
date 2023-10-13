@@ -12,6 +12,14 @@ terraform {
 variable "subscription_id" {}
 variable "tenant_id" {}
 variable "client_id" {}
+variable "azurerm_resource_group_name" {
+  type    = string
+  default = "myxpeResourceGroup" 
+}
+variable "azurerm_resource_group_location" {
+  type    = string
+  default = "East US" 
+}
 
 provider "azurerm" {
   use_oidc = true
@@ -57,8 +65,8 @@ resource "azurerm_role_definition" "custom" {
 # Azure Key Vault
 resource "azurerm_key_vault" "xpe" {
   name                        = "myxpekeyvault"
-  resource_group_name         = azurerm_resource_group.xpe.name
-  location                    = azurerm_resource_group.xpe.location
+  resource_group_name         = var.azurerm_resource_group_name
+  location                    = var.azurerm_resource_group_location
   enabled_for_disk_encryption = true
   enabled_for_deployment      = true
   enabled_for_template_deployment = true
@@ -95,8 +103,8 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
 # Storage Account for TF Backend
 #resource "azurerm_storage_account" "tfstate" {
 #  name                     = "tfstatestorageaccount"
-#  resource_group_name      = azurerm_resource_group.xpe.name
-#  location                 = azurerm_resource_group.xpe.location
+#  resource_group_name      = var.azurerm_resource_group_name
+#  location                 = var.azurerm_resource_group_location
 #  account_tier             = "Standard"
 #  account_replication_type = "LRS"
 #}
@@ -105,14 +113,14 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
 resource "azurerm_virtual_network" "xpe" {
   name                = "myxpeVnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.xpe.location
-  resource_group_name = azurerm_resource_group.xpe.name
+  location            = var.azurerm_resource_group_location
+  resource_group_name = var.azurerm_resource_group_name
 }
 
 # Subnet
 resource "azurerm_subnet" "xpe" {
   name                 = "myxpeSubnet"
-  resource_group_name  = azurerm_resource_group.xpe.name
+  resource_group_name  = var.azurerm_resource_group_name
   virtual_network_name = azurerm_virtual_network.xpe.name
   address_prefixes     = ["10.0.1.0/24"]
 }
@@ -120,8 +128,8 @@ resource "azurerm_subnet" "xpe" {
 # Network Security Group
 resource "azurerm_network_security_group" "xpe" {
   name                = "myxpeNSG"
-  resource_group_name = azurerm_resource_group.xpe.name
-  location            = azurerm_resource_group.xpe.location
+  resource_group_name = var.azurerm_resource_group_name
+  location            = var.azurerm_resource_group_location
 }
 
 # Network Security Rule
@@ -135,23 +143,23 @@ resource "azurerm_network_security_rule" "xpe" {
   destination_port_range      = "22"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.xpe.name
+  resource_group_name         = var.azurerm_resource_group_name
   network_security_group_name = azurerm_network_security_group.xpe.name
 }
 
 # Public IP Address
 resource "azurerm_public_ip" "xpe" {
   name                = "myxpePublicIP"
-  location            = azurerm_resource_group.xpe.location
-  resource_group_name = azurerm_resource_group.xpe.name
+  location            = var.azurerm_resource_group_location
+  resource_group_name = var.azurerm_resource_group_name
   allocation_method   = "Dynamic"
 }
 
 # Network Interface
 resource "azurerm_network_interface" "xpe" {
   name                = "myxpeNIC"
-  location            = azurerm_resource_group.xpe.location
-  resource_group_name = azurerm_resource_group.xpe.name
+  location            = var.azurerm_resource_group_location
+  resource_group_name = var.azurerm_resource_group_name
 
   ip_configuration {
     name                          = "myxpeNICConfg"
@@ -172,8 +180,8 @@ resource "azurerm_role_assignment" "vm_contributor" {
 # Virtual Machine
 resource "azurerm_linux_virtual_machine" "xpe" {
   name                = "myxpeVM"
-  resource_group_name = azurerm_resource_group.xpe.name
-  location            = azurerm_resource_group.xpe.location
+  resource_group_name = var.azurerm_resource_group_name
+  location            = var.azurerm_resource_group_location
   size                = "Standard_B1s"
   admin_username      = "azureuser"
   network_interface_ids = [
@@ -201,8 +209,8 @@ resource "azurerm_linux_virtual_machine" "xpe" {
 # Storage Account
 resource "azurerm_storage_account" "xpe" {
   name                     = "myxpestorageaccount"
-  resource_group_name      = azurerm_resource_group.xpe.name
-  location                 = azurerm_resource_group.xpe.location
+  resource_group_name      = var.azurerm_resource_group_name
+  location                 = var.azurerm_resource_group_location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
