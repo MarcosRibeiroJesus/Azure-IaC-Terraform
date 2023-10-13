@@ -55,17 +55,8 @@ jobs:
             az storage account create --name $NEW_STORAGE_ACCOUNT_NAME --resource-group myxpeResourceGroup --sku Standard_LRS --location EastUS
           fi
 
-      - name: Set up Terraform
-        run: |
-          terraform -v
-          terraform init -backend-config="resource_group_name=myxpeResourceGroup" \
-                          -backend-config="storage_account_name=tfstatestorageaccount" \
-                          -backend-config="container_name=tfstatecontainer" \
-                          -backend-config="key=terraform.tfstate" \
-                          -backend-config="use_oidc=true" \
-                          -backend-config="subscription_id=${SUBSCRIPTION_ID}" \
-                          -backend-config="tenant_id=${TENANT_ID}" \
-                          -backend-config="client_id=${CLIENT_ID}"
+      - name: Terraform Init
+        run: terraform init
 
       #- name: Terraform Plan
       #  run: terraform plan -out=tfplan

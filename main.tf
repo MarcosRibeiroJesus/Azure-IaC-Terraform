@@ -1,24 +1,21 @@
 # We strongly recommend using the required_providers block to set the
 # Azure Provider source and version being used
 terraform {
+
+  backend "azurerm" {
+    resource_group_name = "XpeTerraformRG"
+    storage_account_name = "xpesolutionsmodule1"
+    container_name = "tfstatefile"
+    key = "xpe.terraform.tfstate"
+  }
+  
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "=3.7.0"
     }
   }
-}
 
-variable "subscription_id" {}
-variable "tenant_id" {}
-variable "client_id" {}
-variable "azurerm_resource_group_name" {
-  type    = string
-  default = "myxpeResourceGroup" 
-}
-variable "azurerm_resource_group_location" {
-  type    = string
-  default = "East US" 
 }
 
 provider "azurerm" {
@@ -38,12 +35,6 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 data "azurerm_subscription" "primary" {}
-
-# Resource Group
-#resource "azurerm_resource_group" "xpe" {
-#  name     = "myxpeResourceGroup"
-#  location = "East US"
-#}
 
 # Custom Role Definition
 resource "azurerm_role_definition" "custom" {
