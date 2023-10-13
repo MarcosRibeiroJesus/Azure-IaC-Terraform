@@ -1,34 +1,14 @@
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~>3.0"
-    }
-  }
-
-  backend "azurerm" {
-    use_oidc = true
-    subscription_id = var.subscription_id
-    tenant_id       = var.tenant_id
-    client_id       = var.client_id
-    use_azuread_auth = true
-    key = "terraform.tfstate"
-  }
-}
-
 provider "azurerm" {
-  use_oidc = true
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
-  client_id       = var.client_id
   features {
     key_vault {
       purge_soft_delete_on_destroy    = true
       recover_soft_deleted_key_vaults = true
     }
   }
+  use_oidc = true
+  subscription_id = SUBSCRIPTION_ID
+  tenant_id       = TENANT_ID
+  client_id       = CLIENT_ID
 }
 
 # Service Principal
