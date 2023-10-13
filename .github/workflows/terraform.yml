@@ -65,17 +65,20 @@ jobs:
                           -backend-config="use_oidc=true" \
                           -backend-config="subscription_id=${SUBSCRIPTION_ID}" \
                           -backend-config="tenant_id=${TENANT_ID}" \
-                          -backend-config="client_id=${CLIENT_ID}" \
-                          -var="subscription_id=${SUBSCRIPTION_ID}" \
-                          -var="tenant_id=${TENANT_ID}" \
-                          -var="client_id=${CLIENT_ID}"
+                          -backend-config="client_id=${CLIENT_ID}"
 
       #- name: Terraform Plan
       #  run: terraform plan -out=tfplan
 
       - name: Apply Terraform
-        run: terraform apply -auto-approve
-      
+        run: terraform apply -auto-approve \
+            -var="subscription_id=${SUBSCRIPTION_ID}" \
+            -var="tenant_id=${TENANT_ID}" \
+            -var="client_id=${CLIENT_ID}"
+
       #- name: Run Terraform Destroy
       #  run: |
-      #    terraform destroy -auto-approve
+      #    terraform destroy -auto-approve \
+      #      -var="subscription_id=${SUBSCRIPTION_ID}" \
+      #      -var="tenant_id=${TENANT_ID}" \
+      #      -var="client_id=${CLIENT_ID}"
