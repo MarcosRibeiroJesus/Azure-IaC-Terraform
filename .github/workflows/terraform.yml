@@ -33,10 +33,17 @@ jobs:
 
     # Run az commands to confirm sub access
     - name: 'Run az commands'
+      env:
+        STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
+        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+        RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+        CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       run: |
         az account show
-        az login --tenant ${{ secrets.AZURE_TENANT_ID }}
-        az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        az login --tenant "$TENANT_ID"
+        az account set --subscription "$SUBSCRIPTION_ID"
 
     # Run Terraform init
     - name: Terraform Init
