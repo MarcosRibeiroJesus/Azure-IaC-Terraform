@@ -32,10 +32,10 @@ data "azurerm_client_config" "current" {}
 data "azurerm_subscription" "primary" {}
 
 # Resource Group
-resource "azurerm_resource_group" "xpe" {
-  name     = "myxpeResourceGroup"
-  location = "East US"
-}
+#resource "azurerm_resource_group" "xpe" {
+#  name     = "myxpeResourceGroup"
+#  location = "East US"
+#}
 
 # Custom Role Definition
 resource "azurerm_role_definition" "custom" {
